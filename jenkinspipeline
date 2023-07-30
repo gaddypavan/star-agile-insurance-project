@@ -1,0 +1,43 @@
+pipeline {
+  agent any
+  
+  environment {
+    AWS_ACCESS_KEY_ID     = AKIAWFVLUH5A4UHWDRME
+    AWS_SECRET_ACCESS_KEY = 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
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        git 'https://github.com/babupavan/star-agile-banking-finance.git'
+      }
+    }
+    
+    stage('Terraform Init') {
+      steps {
+        sh 'terraform init'
+      }
+    }
+    
+    stage('Terraform validate') {
+      steps {
+        sh 'terraform validate'
+      }
+    }
+
+    stage('Terraform Plan') {
+      steps {
+        sh 'terraform plan'
+      }
+    }
+
+    stage('Terraform Apply') {
+      when {
+        expression { return true }
+      }
+      steps {
+        sh 'terraform apply -auto-approve'
+      }
+    }
+  }
+}
