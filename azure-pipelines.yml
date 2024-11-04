@@ -1,0 +1,36 @@
+trigger:
+- master
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  MAVEN: mvn
+  DOCKER: docker
+  appname: pavan-image123
+
+steps:
+- task: Checkout@1
+  inputs:
+    repository: 'https://github.com/babupavan/star-agile-insurance-project.git'
+    persistCredentials: true
+    clean: true
+
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '11'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    goals: 'package'
+
+- script: |
+    docker build -t pavan .
+  displayName: 'Docker Build'
+
+- script: |
+    docker run -d -p 8081:8081 --name $(appname) pavan:latest
+  displayName: 'Docker Run'
